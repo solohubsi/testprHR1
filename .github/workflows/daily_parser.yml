@@ -40,7 +40,7 @@ jobs:
           fi
 
           git rm -rf .
-          copy djinni_structured_tqdm.xlsx .
+          cp djinni_structured_tqdm.xlsx .
           git add djinni_structured_tqdm.xlsx
           git commit -m "Daily update: ${{ github.run_date }}"
           git push origin gh-pages --force
