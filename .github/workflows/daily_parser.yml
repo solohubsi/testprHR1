@@ -24,7 +24,7 @@ jobs:
         run: pip install selenium openpyxl tqdm
 
       - name: Run parser
-        run: python parser.py
+        run: python mainpars.py
 
       - name: Publish Excel to gh-pages
         env:
