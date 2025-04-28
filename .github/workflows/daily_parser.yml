@@ -24,7 +24,7 @@ jobs:
         run: pip install selenium openpyxl tqdm
 
       - name: Run parser
-        run: python mainpars.py
+        run: python HR11/mainpars.py
 
       - name: Publish Excel to gh-pages
         env:
@@ -40,7 +40,7 @@ jobs:
           fi
 
           git rm -rf .
-          cp djinni_structured_tqdm.xlsx .
+          cp HR11/djinni_structured_tqdm.xlsx .
           git add djinni_structured_tqdm.xlsx
           git commit -m "Daily update: ${{ github.run_date }}"
           git push origin gh-pages --force
