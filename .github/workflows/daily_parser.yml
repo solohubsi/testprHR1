@@ -1,4 +1,7 @@
 name: Daily DJinni Parser
+permissions:
+  contents: write
+  pages: write
 
 on:
   schedule:
