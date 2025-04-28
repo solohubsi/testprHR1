@@ -2,7 +2,7 @@ name: Daily DJinni Parser
 
 on:
   schedule:
-    - cron: '10 9 * * *'
+    - cron: '*/45 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -40,7 +40,7 @@ jobs:
           fi
 
           git rm -rf .
-          cp HR11/djinni_structured_tqdm.xlsx .
+          cp djinni_structured_tqdm.xlsx .
           git add djinni_structured_tqdm.xlsx
           git commit -m "Daily update: ${{ github.run_date }}"
           git push origin gh-pages --force

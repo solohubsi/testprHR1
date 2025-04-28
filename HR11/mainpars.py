@@ -4,12 +4,26 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import openpyxl
-from openpyxl import Workbook
+from openpyxl import load_workbook, Workbook
 import os
 from tqdm import tqdm
+from datetime import date
+import sys
 
 # Шлях до Excel
 excel_path = "djinni_structured_tqdm.xlsx"
+today = date.today().isoformat()
+
+# Якщо файл існує, перевіряємо дату останнього запису
+if os.path.exists(excel_path):
+    wb_check = load_workbook(excel_path, read_only=True)
+    ws_check = wb_check["Salaries"]
+    last_date = ws_check.cell(row=ws_check.max_row, column=8).value
+    wb_check.close()
+
+    if last_date == today:
+        print(f"Дані за {today} вже записані — завершуємо.")
+        sys.exit(0)
 
 # Рівні досвіду та їх відображення
 experiences = [0, 1, 2, 3, 5]
