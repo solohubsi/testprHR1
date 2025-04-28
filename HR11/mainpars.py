@@ -144,9 +144,9 @@ for category in categories:
         experience_label, level = exp_mapping.get(exp, (f"{exp} років", "unknown"))
 
         # Виводимо в консоль
-        print(f"{category} | {experience_label} ({level}) → "
-              f"salary_min={min_salary}, salary_max={max_salary}, "
-              f"candidates={candidates}, vacancies={vacancies}")
+        #print(f"{category} | {experience_label} ({level}) → "
+        #      f"salary_min={min_salary}, salary_max={max_salary}, "
+        #      f"candidates={candidates}, vacancies={vacancies}")
 
         # Якщо немає даних по зарплаті — пропускаємо запис
         if min_salary is None and max_salary is None:

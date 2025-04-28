@@ -39,8 +39,12 @@ jobs:
             git checkout --orphan gh-pages
           fi
 
+          # Спочатку переіменуємо щойно згенерований файл у тимчасовий
+          mv djinni_structured_tqdm.xlsx tmp.xlsx
+          # Видаляємо все в гілці gh-pages
           git rm -rf .
-          cp djinni_structured_tqdm.xlsx .
+          # Повертаємо наш Excel із tmp.xlsx
+          mv tmp.xlsx djinni_structured_tqdm.xlsx
           git add djinni_structured_tqdm.xlsx
           git commit -m "Daily update: ${{ github.run_date }}"
           git push origin gh-pages --force
