@@ -1,41 +1,66 @@
+import os
+import sys
+from datetime import date
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import openpyxl
-from openpyxl import load_workbook, Workbook
-import os
+from openpyxl import Workbook, load_workbook
 from tqdm import tqdm
-from datetime import date
-import sys
 
 # Шлях до Excel
 excel_path = "djinni_structured_tqdm.xlsx"
 today = date.today().isoformat()
 
-# Якщо файл існує, перевіряємо дату останнього запису
+# 1) Перевірка дублювання: якщо в останньому рядку вже today's date — вихід
 if os.path.exists(excel_path):
     wb_check = load_workbook(excel_path, read_only=True)
-    ws_check = wb_check["Salaries"]
+    ws_check = wb_check.active
     last_date = ws_check.cell(row=ws_check.max_row, column=8).value
     wb_check.close()
-
     if last_date == today:
-        print(f"Дані за {today} вже записані — завершуємо.")
+        print(f"✅ Дані за {today} уже збережені — завершуємо.")
         sys.exit(0)
 
-# Рівні досвіду та їх відображення
+# 2) Якщо файлу нема — створюємо з шапкою
+if not os.path.exists(excel_path):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Salaries"
+    ws.append([
+        "category",
+        "salary_min",
+        "salary_max",
+        "experience_label",
+        "level",
+        "candidates",
+        "vacancies",
+        "scrape_date"
+    ])
+    wb.save(excel_path)
+
+# 3) Відкриваємо Excel для дозапису
+wb = load_workbook(excel_path)
+ws = wb.active
+
+# 4) Налаштування Selenium (Chromium у Actions, локально теж)
+options = Options()
+options.add_argument('--headless')
+options.add_argument('--disable-gpu')
+driver = webdriver.Chrome(options=options)
+
+# 5) Задаємо рівні досвіду
 experiences = [0, 1, 2, 3, 5]
 exp_mapping = {
     0: ("<1 року", "junior"),
     1: ("1-2 роки", "middle"),
     2: ("2-3 роки", "middle"),
     3: ("3-5 років", "senior"),
-    5: ("5+ років", "senior")
+    5: ("5+ років", "senior"),
 }
 
-# Категорії для парсингу
+# 6) Повний список категорій
 categories = [
     "javascript", "fullstack", "java", "dotnet", "python", "php", "node_js", "ios", "android", "react_native",
     "cplusplus", "flutter", "golang", "ruby", "scala", "salesforce", "rust", "elixir", "kotlin", "erp_systems",
@@ -53,124 +78,72 @@ categories = [
     "cio", "cfo", "cco", "cbdo", "head_chief", "lead"
 ]
 
-def create_excel(path):
-    wb = Workbook()
-    ws = wb.active
-    ws.title = "Salaries"
-    ws.append([
-        "category",
-        "salary_min",
-        "salary_max",
-        "experience_label",
-        "level",
-        "candidates",
-        "vacancies"
-    ])
-    wb.save(path)
-
-# Якщо файл не існує — створюємо з заголовками
-if not os.path.exists(excel_path):
-    create_excel(excel_path)
-
-# Завантажуємо Excel
-wb = openpyxl.load_workbook(excel_path)
-ws = wb["Salaries"]
-
-# Налаштування headless Chrome
-options = Options()
-options.add_argument('--headless')
-options.add_argument('--disable-gpu')
-driver = webdriver.Chrome(options=options)
-
-# Прогресбар
+# 7) Основний цикл із прогресбаром
 total = len(categories) * len(experiences)
-pbar = tqdm(total=total, desc="Парсинг Djinni", ncols=100)
+pbar = tqdm(total=total, desc="Парсинг Djinni")
 
 for category in categories:
     for exp in experiences:
         url = f"https://djinni.co/salaries/?category={category}&exp={exp}"
         driver.get(url)
 
-        min_salary = max_salary = candidates = vacancies = None
-
-        # Парсимо мін/макс зарплату
+        # парсимо мінімальну зарплату
         try:
-            WebDriverWait(driver, 5).until(
+            el_min = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located(
-                    (By.XPATH, '//*[@id="candidates_salaries"]/div/div[2]')
+                    (By.XPATH, '//*[@id="candidates_salaries"]/div/div[2]/span[1]')
                 )
             )
-            try:
-                el = driver.find_element(
-                    By.XPATH,
-                    '//*[@id="candidates_salaries"]/div/div[2]/span[1]'
-                )
-                min_salary = int(el.text.strip().replace(" ", "").replace(",", ""))
-            except:
-                pass
-            try:
-                el = driver.find_element(
-                    By.XPATH,
-                    '//*[@id="candidates_salaries"]/div/div[2]/span[2]'
-                )
-                max_salary = int(el.text.strip().replace(" ", "").replace(",", ""))
-            except:
-                pass
+            min_salary = int(el_min.text.strip().replace(" ", "").replace(",", ""))
         except:
-            pass
+            min_salary = None
 
-        # Парсимо кількість кандидатів
+        # парсимо максимальну зарплату
         try:
-            el = driver.find_element(
-                By.XPATH,
-                '//*[@id="candidates_card"]/div[2]/span[1]'
+            el_max = driver.find_element(
+                By.XPATH, '//*[@id="candidates_salaries"]/div/div[2]/span[2]'
             )
-            txt = el.text.strip().replace(" ", "").replace(",", "")
-            candidates = int(txt) if txt.isdigit() else None
+            max_salary = int(el_max.text.strip().replace(" ", "").replace(",", ""))
         except:
-            pass
+            max_salary = None
 
-        # Парсимо кількість вакансій
+        # кількість кандидатів
         try:
-            el = driver.find_element(
-                By.XPATH,
-                '//*[@id="jobs_card"]/div[2]/span[1]'
+            el_c = driver.find_element(
+                By.XPATH, '//*[@id="candidates_card"]/div[2]/span[1]'
             )
-            txt = el.text.strip().replace(" ", "").replace(",", "")
-            vacancies = int(txt) if txt.isdigit() else None
+            candidates = int(el_c.text.strip().replace(" ", "").replace(",", ""))
         except:
-            pass
+            candidates = None
 
-        experience_label, level = exp_mapping.get(exp, (f"{exp} років", "unknown"))
+        # кількість вакансій
+        try:
+            el_v = driver.find_element(
+                By.XPATH, '//*[@id="jobs_card"]/div[2]/span[1]'
+            )
+            vacancies = int(el_v.text.strip().replace(" ", "").replace(",", ""))
+        except:
+            vacancies = None
 
-        # Виводимо в консоль
-        #print(f"{category} | {experience_label} ({level}) → "
-        #      f"salary_min={min_salary}, salary_max={max_salary}, "
-        #      f"candidates={candidates}, vacancies={vacancies}")
+        label, level = exp_mapping[exp]
 
-        # Якщо немає даних по зарплаті — пропускаємо запис
-        if min_salary is None and max_salary is None:
-            pbar.update(1)
-            continue
-
-        # Додаємо рядок до Excel
-        ws.append([
-            category,
-            min_salary,
-            max_salary,
-            experience_label,
-            level,
-            candidates,
-            vacancies
-        ])
-
-        # Зберігаємо одразу після кожного додавання
-        wb.save(excel_path)
+        # тільки якщо є хоч одна цифра зарплати — дозапис
+        if min_salary is not None or max_salary is not None:
+            ws.append([
+                category,
+                min_salary,
+                max_salary,
+                label,
+                level,
+                candidates,
+                vacancies,
+                today
+            ])
+            wb.save(excel_path)
 
         pbar.update(1)
 
-pbar.close()
-
-# Закриваємо браузер
+# 8) Завершуємо
 driver.quit()
-print("✅ Структурований файл із прогресбаром створено.")
+pbar.close()
+print(f"✅ Файл оновлено: {excel_path}")
