@@ -15,7 +15,7 @@ categories = [
     "hr", "recruiter", "content_manager", "content_writing", "content_marketing", "product_manager",
     "product_owner", "project_manager", "scrum_master", "engineering_manager", "delivery_manager",
     "business_analyst", "data_analyst", "data_engineer", "data_science", "ml_ai", "cto", "cpo", "cmo", "ceo", "coo",
-    "cio", "cfo", "cco", "cbdo", "head_chief", "lead"
+    "cio", "cfo", "cco", "cbdo", "head_chief", "accountant", "finance_manager", "finances", "financial_analyst", "lead"
 ]
 
 # Мапінг категорій на ролі, групу та тип
@@ -107,6 +107,10 @@ role_map = {
     "cpo":                  ("CPO",             "Executive",               "back_office"),
     "cbdo":                 ("CBDO",            "Executive",               "back_office"),
     "head_chief":           ("Head Chief",      "Executive",               "back_office"),
+    "finance_manager":      ("Finance",      "Finance",               "back_office"),
+    "finances":      ("Finance",      "Finance",               "back_office"),
+    "accountant":      ("Finance",      "Finance",               "back_office"),
+    "financial_analyst":      ("Finance",      "Finance",               "back_office"),
     "lead":                 ("Lead",            "Management",              "back_office")
 }
 
