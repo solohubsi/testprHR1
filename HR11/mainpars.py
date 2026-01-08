@@ -75,7 +75,7 @@ categories = [
     "hr", "recruiter", "content_manager", "content_writing", "content_marketing", "product_manager",
     "product_owner", "project_manager", "scrum_master", "engineering_manager", "delivery_manager",
     "business_analyst", "data_analyst", "data_engineer", "data_science", "ml_ai", "cto", "cpo", "cmo", "ceo", "coo",
-    "cio", "cfo", "cco", "cbdo", "head_chief", "accountant", "finance_manager", "finances", "financial_analyst", "lead"
+    "cio", "cfo", "cco", "cbdo", "head_chief", "accountant", "finance_manager", "finances", "financial_analyst", "dev_ops", "lead"
 ]
 
 # 7) Основний цикл із прогресбаром
