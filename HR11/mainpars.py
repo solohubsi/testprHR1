@@ -71,7 +71,7 @@ categories = [
     "security", "security_analyst", "information_security", "penetration_tester", "sysadmin", "sql_dba", "drupal",
     "wordpress", "yii", "laravel", "magento", "symfony", "odoo", "sap", "ms_dynamics", "vue", "svelte", "react",
     "angular", "marketing", "marketing_analyst", "digital_marketing", "digital_marketing_manager", "media_buying",
-    "affiliate_manager", "seo", "ppc", "social_media", "pr_manager", "sales", "lead_generation", "support",
+    "affiliate_manager", "seo", "ppc", "social_media", "pr_manager", "sales", "sales_manager", "sales_leadership", "lead_generation", "support",
     "hr", "recruiter", "content_manager", "content_writing", "content_marketing", "product_manager",
     "product_owner", "project_manager", "scrum_master", "engineering_manager", "delivery_manager",
     "business_analyst", "data_analyst", "data_engineer", "data_science", "ml_ai", "cto", "cpo", "cmo", "ceo", "coo",
